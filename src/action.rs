@@ -117,10 +117,7 @@ impl TryFrom<kernel_sigaction> for SignalAction {
     type Error = LinuxError;
 
     fn try_from(value: kernel_sigaction) -> Result<Self, Self::Error> {
-        let Some(flags) = SignalActionFlags::from_bits(value.sa_flags) else {
-            warn!("unrecognized signal flags: {}", value.sa_flags);
-            return Err(LinuxError::EINVAL);
-        };
+        let flags = SignalActionFlags::from_bits_truncate(value.sa_flags);
         let disposition = {
             match value.sa_handler_kernel {
                 None => {
